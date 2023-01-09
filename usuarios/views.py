@@ -3,4 +3,4 @@ from django.http import HttpResponse
 
 
 def cadastro(request):
-    return HttpResponse('Olá estou no cadastro')
+    return render(request, 'cadastro.html')

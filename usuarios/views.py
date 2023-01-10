@@ -6,9 +6,9 @@ from django.contrib.auth import authenticate, login, logout
 
 
 def cadastro(request):
+    if request.user.is_authenticated:
+        return redirect('/divulgar/novo_pet')
     if request.method == "GET":
-        if request.user.is_authenticated:
-            return redirect('/divulgar/novo_pet')
         return render(request, 'cadastro.html')
     elif request.method == "POST":
         nome = request.POST.get('nome')
@@ -38,9 +38,9 @@ def cadastro(request):
 
 
 def logar(request):
+    if request.user.is_authenticated:
+        return redirect('/divulgar/novo_pet')
     if request.method == "GET":
-        if request.user.is_authenticated:
-            return redirect('/divulgar/novo_pet')
         return render(request, 'login.html')
     elif request.method == "POST":
         nome = request.POST.get('nome')

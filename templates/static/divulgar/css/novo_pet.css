@@ -1,6 +1,7 @@
 .sidebar{
     text-align: center;
     padding: 20px;
+    min-height: 728px;
     height: auto;
 
 }

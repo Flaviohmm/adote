@@ -3,6 +3,8 @@ from django.contrib.auth.decorators import login_required
 from .models import Tag, Raca, Pet
 from django.contrib import messages
 from django.contrib.messages import constants
+from adotar.models import PedidoAdocao
+from django.core.mail import send_mail
 
 
 @login_required
@@ -72,3 +74,39 @@ def ver_pet(request, id):
     if request.method == "GET":
         pet = Pet.objects.get(id=id)
         return render(request, 'ver_pet.html', {'pet': pet})
+
+
+@login_required
+def ver_pedido_adocao(request):
+    if request.method == "GET":
+        pedidos = PedidoAdocao.objects.filter(usuario=request.user).filter(status="AG")
+        return render(request, 'ver_pedido_adocao.html', {'pedidos': pedidos})
+
+
+@login_required
+def processa_pedido_adocao(request, id_pedido):
+    status = request.GET.get('status')
+    pedido = PedidoAdocao.objects.get(id=id_pedido)
+
+    if status == "A":
+        pedido.status = 'AP'
+        string = '''Olá, sua adoção foi aprovada. ...'''
+        pet = Pet.objects.get(id=pedido.pet.id)
+        pet.status = 'A'
+    elif status == "R":
+        string = '''Olá, sua adoção foi recusada. ...'''
+        pedido.status = 'R'
+
+    pedido.save()
+    pet.save()
+
+    print(pedido.usuario.email)
+    email = send_mail(
+        'Sua adoção foi processada',
+        string,
+        'flavio@pythonando.com.br',
+        [pedido.usuario.email,],
+    )
+
+    messages.add_message(request, constants.SUCCESS, 'Pedido de adoção processado com sucesso')
+    return redirect('/divulgar/ver_pedido_adocao')
